@@ -6,7 +6,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure
-        run: cmake -B build -G "Visual Studio 17 2022" -A x64
+        shell: pwsh
+        run: |
+          $f = Get-ChildItem -Recurse -Filter CMakeLists.txt | Select-Object -First 1
+          if (-not $f) { Write-Error "CMakeLists.txt не найден - залей файлы из архива"; exit 1 }
+          cmake -S $f.DirectoryName -B build -G "Visual Studio 17 2022" -A x64
       - name: Build
         run: cmake --build build --config Release
       - uses: actions/upload-artifact@v4
